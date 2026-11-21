@@ -1,0 +1,602 @@
+<mujoco>
+
+  <compiler angle="degree"/>
+
+  <asset>
+    <texture type="skybox"
+             builtin="gradient"
+             rgb1="1 1 1"
+             rgb2=".6 .8 1"
+             width="256"
+             height="256"/>
+
+    <texture name="texplane"
+             type="2d"
+             builtin="checker"
+             rgb1=".2 .3 .4"
+             rgb2=".1 0.15 0.2"
+             width="512"
+             height="512"
+             mark="cross"
+             markrgb=".8 .8 .8"/>
+
+    <material name="matplane"
+              reflectance="0"
+              texture="texplane"
+              texrepeat="2 2"
+              texuniform="true"/>
+  </asset>
+
+  <extension>
+    <plugin plugin="mujoco.elasticity.cable"/>
+  </extension>
+
+  <option gravity="0 0 0" integrator="implicitfast" iterations="400"/>
+
+  <visual>
+    <global offheight="2160" offwidth="3840"/>
+    <quality offsamples="8"/>
+  </visual>
+
+  <worldbody>
+
+    <light diffuse=".8 .8 .8" pos="0 0 5" dir="0 0 -1"/>
+
+    <!-- Ground -->
+    <geom type="plane" size="0 0 0.03" material="matplane" rgba="1 1 1 0.2"/>
+    <geom type="plane" pos="0 0 0.35" axisangle="1 0 0 180" size="0 0 0.03" material="matplane" rgba="1 1 1 0.2"/>
+
+    <!-- ================= WHISKER PLATFORM (static, fixed to world) ================= -->
+    <!-- Grid: 4 columns (X: -0.018, -0.006, 0.006, 0.018) x 4 rows (Z: 0.235, 0.245, 0.255, 0.265) -->
+    <!-- Column spacing: 12mm, Row spacing: 10mm -->
+    <body name="whisker_platform" pos="0 0.1 0">
+
+      <!-- PCB board: sized to cover 4x4 grid with some margin -->
+      <geom type="box" size="0.03 0.002 0.025" pos="0 0.01 0.25" rgba=".2 .6 .2 1" contype="0" conaffinity="0"/>
+
+      <!-- ================= ROW 1 (z=0.235) ================= -->
+
+      <!-- WHISKER 1: col 1, row 1 -->
+      <body name="whisker_base_1" pos="-0.018 0 0.235" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_1"/>
+        <body name="whisker_hinge_1">
+          <joint name="base2whisker1_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_1">
+            <joint name="base2whisker1_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker1_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker1" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 2: col 2, row 1 -->
+      <body name="whisker_base_2" pos="-0.006 0 0.235" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_2"/>
+        <body name="whisker_hinge_2">
+          <joint name="base2whisker2_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_2">
+            <joint name="base2whisker2_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker2_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker2" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 3: col 3, row 1 -->
+      <body name="whisker_base_3" pos="0.006 0 0.235" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_3"/>
+        <body name="whisker_hinge_3">
+          <joint name="base2whisker3_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_3">
+            <joint name="base2whisker3_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker3_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker3" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 4: col 4, row 1 -->
+      <body name="whisker_base_4" pos="0.018 0 0.235" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_4"/>
+        <body name="whisker_hinge_4">
+          <joint name="base2whisker4_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_4">
+            <joint name="base2whisker4_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker4_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker4" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- ================= ROW 2 (z=0.245) ================= -->
+
+      <!-- WHISKER 5: col 1, row 2 -->
+      <body name="whisker_base_5" pos="-0.018 0 0.245" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_5"/>
+        <body name="whisker_hinge_5">
+          <joint name="base2whisker5_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_5">
+            <joint name="base2whisker5_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker5_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker5" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 6: col 2, row 2 -->
+      <body name="whisker_base_6" pos="-0.006 0 0.245" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_6"/>
+        <body name="whisker_hinge_6">
+          <joint name="base2whisker6_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_6">
+            <joint name="base2whisker6_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker6_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker6" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 7: col 3, row 2 -->
+      <body name="whisker_base_7" pos="0.006 0 0.245" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_7"/>
+        <body name="whisker_hinge_7">
+          <joint name="base2whisker7_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_7">
+            <joint name="base2whisker7_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker7_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker7" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 8: col 4, row 2 -->
+      <body name="whisker_base_8" pos="0.018 0 0.245" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_8"/>
+        <body name="whisker_hinge_8">
+          <joint name="base2whisker8_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_8">
+            <joint name="base2whisker8_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker8_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker8" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- ================= ROW 3 (z=0.255) ================= -->
+
+      <!-- WHISKER 9: col 1, row 3 -->
+      <body name="whisker_base_9" pos="-0.018 0 0.255" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_9"/>
+        <body name="whisker_hinge_9">
+          <joint name="base2whisker9_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_9">
+            <joint name="base2whisker9_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker9_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker9" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 10: col 2, row 3 -->
+      <body name="whisker_base_10" pos="-0.006 0 0.255" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_10"/>
+        <body name="whisker_hinge_10">
+          <joint name="base2whisker10_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_10">
+            <joint name="base2whisker10_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker10_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker10" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 11: col 3, row 3 -->
+      <body name="whisker_base_11" pos="0.006 0 0.255" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_11"/>
+        <body name="whisker_hinge_11">
+          <joint name="base2whisker11_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_11">
+            <joint name="base2whisker11_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker11_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker11" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 12: col 4, row 3 -->
+      <body name="whisker_base_12" pos="0.018 0 0.255" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_12"/>
+        <body name="whisker_hinge_12">
+          <joint name="base2whisker12_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_12">
+            <joint name="base2whisker12_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker12_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker12" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- ================= ROW 4 (z=0.265) ================= -->
+
+      <!-- WHISKER 13: col 1, row 4 -->
+      <body name="whisker_base_13" pos="-0.018 0 0.265" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_13"/>
+        <body name="whisker_hinge_13">
+          <joint name="base2whisker13_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_13">
+            <joint name="base2whisker13_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker13_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker13" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 14: col 2, row 4 -->
+      <body name="whisker_base_14" pos="-0.006 0 0.265" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_14"/>
+        <body name="whisker_hinge_14">
+          <joint name="base2whisker14_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_14">
+            <joint name="base2whisker14_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker14_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker14" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 15: col 3, row 4 -->
+      <body name="whisker_base_15" pos="0.006 0 0.265" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_15"/>
+        <body name="whisker_hinge_15">
+          <joint name="base2whisker15_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_15">
+            <joint name="base2whisker15_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker15_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker15" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+      <!-- WHISKER 16: col 4, row 4 -->
+      <body name="whisker_base_16" pos="0.018 0 0.265" axisangle="1 0 0 90">
+        <geom type="cylinder" size="0.005 0.005" rgba=".3 .6 .8 .5" mass="0.1" contype="0" conaffinity="0"/>
+        <site name="vel_sensor_16"/>
+        <body name="whisker_hinge_16">
+          <joint name="base2whisker16_y" type="hinge" axis="0 1 0" damping="0.01" stiffness="1" armature="0.00001"/>
+          <geom type="sphere" size="0.0001" mass="0.0001" contype="0" conaffinity="0" rgba=".3 .6 .8 0"/>
+          <body name="whisker_body_16">
+            <joint name="base2whisker16_x" type="hinge" axis="1 0 0" damping="0.01" stiffness="1" armature="0.00001"/>
+            <geom type="cylinder" size="0.000125 0.01" rgba=".3 .6 .8 1" mass="0.005" contype="0" conaffinity="0"/>
+            <site name="whisker16_cable_base" pos="0 0 0.01" size="0.001"/>
+            <composite prefix="whisker16" type="cable" curve="0 0 s" count="40 1 1" size="0.08 0 0" initial="none">
+              <plugin plugin="mujoco.elasticity.cable">
+                <config key="twist" value="40e9"/>
+                <config key="bend" value="100e9"/>
+                <config key="vmax" value="0.001"/>
+              </plugin>
+              <joint kind="main" damping="0.001" armature="0.00001"/>
+              <geom type="capsule" size=".000125" condim="1" density="6450"/>
+            </composite>
+          </body>
+        </body>
+      </body>
+
+    </body> <!-- end whisker_platform -->
+
+
+    <!-- ================= MOVABLE CYLINDER ================= -->
+    <body name="around_circle" pos="0 0 0.25" axisangle="0 1 0 90">
+
+      <joint name="cylinder_joint_x" type="slide" axis="1 0 0" damping="10" armature="0.001" stiffness="0"/>
+      <joint name="cylinder_joint_y" type="slide" axis="0 1 0" damping="10" armature="0.001" stiffness="0"/>
+      <joint name="cylinder_joint_z" type="slide" axis="0 0 1" damping="10" armature="0.001" stiffness="0"/>
+
+      <!-- <geom type="cylinder"
+            size="0.01 0.05"
+            pos="0 -0.05 0"
+            rgba=".8 .4 .1 1"
+            condim="1"/> -->
+
+      <geom type="sphere"
+            size="0.022"
+            pos="0 -0.05 0"
+            rgba=".8 .4 .1 1"
+            condim="1"/>
+    </body>
+
+  </worldbody>
+
+
+  <!-- ================= ACTUATORS ================= -->
+  <actuator>
+
+    <velocity joint="cylinder_joint_x" name="act_cylinder_x"/>
+    <velocity joint="cylinder_joint_y" name="act_cylinder_y"/>
+    <velocity joint="cylinder_joint_z" name="act_cylinder_z"/>
+
+  </actuator>
+
+
+  <!-- ================= SENSORS ================= -->
+  <sensor>
+
+    <!-- WHISKER 1 -->
+    <jointpos joint="base2whisker1_y" name="whisker1_y"/>
+    <jointpos joint="base2whisker1_x" name="whisker1_x"/>
+    <velocimeter site="vel_sensor_1" name="vel_1"/>
+    <framepos objtype="site" objname="whisker1S_last" reftype="site" refname="vel_sensor_1" name="tip_pos_1"/>
+    <framequat objtype="site" objname="whisker1S_first" name="whisker1_quat"/>
+
+    <!-- WHISKER 2 -->
+    <jointpos joint="base2whisker2_y" name="whisker2_y"/>
+    <jointpos joint="base2whisker2_x" name="whisker2_x"/>
+    <velocimeter site="vel_sensor_2" name="vel_2"/>
+    <framepos objtype="site" objname="whisker2S_last" reftype="site" refname="vel_sensor_2" name="tip_pos_2"/>
+    <framequat objtype="site" objname="whisker2S_first" name="whisker2_quat"/>
+
+    <!-- WHISKER 3 -->
+    <jointpos joint="base2whisker3_y" name="whisker3_y"/>
+    <jointpos joint="base2whisker3_x" name="whisker3_x"/>
+    <velocimeter site="vel_sensor_3" name="vel_3"/>
+    <framepos objtype="site" objname="whisker3S_last" reftype="site" refname="vel_sensor_3" name="tip_pos_3"/>
+    <framequat objtype="site" objname="whisker3S_first" name="whisker3_quat"/>
+
+    <!-- WHISKER 4 -->
+    <jointpos joint="base2whisker4_y" name="whisker4_y"/>
+    <jointpos joint="base2whisker4_x" name="whisker4_x"/>
+    <velocimeter site="vel_sensor_4" name="vel_4"/>
+    <framepos objtype="site" objname="whisker4S_last" reftype="site" refname="vel_sensor_4" name="tip_pos_4"/>
+    <framequat objtype="site" objname="whisker4S_first" name="whisker4_quat"/>
+
+    <!-- WHISKER 5 -->
+    <jointpos joint="base2whisker5_y" name="whisker5_y"/>
+    <jointpos joint="base2whisker5_x" name="whisker5_x"/>
+    <velocimeter site="vel_sensor_5" name="vel_5"/>
+    <framepos objtype="site" objname="whisker5S_last" reftype="site" refname="vel_sensor_5" name="tip_pos_5"/>
+    <framequat objtype="site" objname="whisker5S_first" name="whisker5_quat"/>
+
+    <!-- WHISKER 6 -->
+    <jointpos joint="base2whisker6_y" name="whisker6_y"/>
+    <jointpos joint="base2whisker6_x" name="whisker6_x"/>
+    <velocimeter site="vel_sensor_6" name="vel_6"/>
+    <framepos objtype="site" objname="whisker6S_last" reftype="site" refname="vel_sensor_6" name="tip_pos_6"/>
+    <framequat objtype="site" objname="whisker6S_first" name="whisker6_quat"/>
+
+    <!-- WHISKER 7 -->
+    <jointpos joint="base2whisker7_y" name="whisker7_y"/>
+    <jointpos joint="base2whisker7_x" name="whisker7_x"/>
+    <velocimeter site="vel_sensor_7" name="vel_7"/>
+    <framepos objtype="site" objname="whisker7S_last" reftype="site" refname="vel_sensor_7" name="tip_pos_7"/>
+    <framequat objtype="site" objname="whisker7S_first" name="whisker7_quat"/>
+
+    <!-- WHISKER 8 -->
+    <jointpos joint="base2whisker8_y" name="whisker8_y"/>
+    <jointpos joint="base2whisker8_x" name="whisker8_x"/>
+    <velocimeter site="vel_sensor_8" name="vel_8"/>
+    <framepos objtype="site" objname="whisker8S_last" reftype="site" refname="vel_sensor_8" name="tip_pos_8"/>
+    <framequat objtype="site" objname="whisker8S_first" name="whisker8_quat"/>
+
+    <!-- WHISKER 9 -->
+    <jointpos joint="base2whisker9_y" name="whisker9_y"/>
+    <jointpos joint="base2whisker9_x" name="whisker9_x"/>
+    <velocimeter site="vel_sensor_9" name="vel_9"/>
+    <framepos objtype="site" objname="whisker9S_last" reftype="site" refname="vel_sensor_9" name="tip_pos_9"/>
+    <framequat objtype="site" objname="whisker9S_first" name="whisker9_quat"/>
+
+    <!-- WHISKER 10 -->
+    <jointpos joint="base2whisker10_y" name="whisker10_y"/>
+    <jointpos joint="base2whisker10_x" name="whisker10_x"/>
+    <velocimeter site="vel_sensor_10" name="vel_10"/>
+    <framepos objtype="site" objname="whisker10S_last" reftype="site" refname="vel_sensor_10" name="tip_pos_10"/>
+    <framequat objtype="site" objname="whisker10S_first" name="whisker10_quat"/>
+
+    <!-- WHISKER 11 -->
+    <jointpos joint="base2whisker11_y" name="whisker11_y"/>
+    <jointpos joint="base2whisker11_x" name="whisker11_x"/>
+    <velocimeter site="vel_sensor_11" name="vel_11"/>
+    <framepos objtype="site" objname="whisker11S_last" reftype="site" refname="vel_sensor_11" name="tip_pos_11"/>
+    <framequat objtype="site" objname="whisker11S_first" name="whisker11_quat"/>
+
+    <!-- WHISKER 12 -->
+    <jointpos joint="base2whisker12_y" name="whisker12_y"/>
+    <jointpos joint="base2whisker12_x" name="whisker12_x"/>
+    <velocimeter site="vel_sensor_12" name="vel_12"/>
+    <framepos objtype="site" objname="whisker12S_last" reftype="site" refname="vel_sensor_12" name="tip_pos_12"/>
+    <framequat objtype="site" objname="whisker12S_first" name="whisker12_quat"/>
+
+    <!-- WHISKER 13 -->
+    <jointpos joint="base2whisker13_y" name="whisker13_y"/>
+    <jointpos joint="base2whisker13_x" name="whisker13_x"/>
+    <velocimeter site="vel_sensor_13" name="vel_13"/>
+    <framepos objtype="site" objname="whisker13S_last" reftype="site" refname="vel_sensor_13" name="tip_pos_13"/>
+    <framequat objtype="site" objname="whisker13S_first" name="whisker13_quat"/>
+
+    <!-- WHISKER 14 -->
+    <jointpos joint="base2whisker14_y" name="whisker14_y"/>
+    <jointpos joint="base2whisker14_x" name="whisker14_x"/>
+    <velocimeter site="vel_sensor_14" name="vel_14"/>
+    <framepos objtype="site" objname="whisker14S_last" reftype="site" refname="vel_sensor_14" name="tip_pos_14"/>
+    <framequat objtype="site" objname="whisker14S_first" name="whisker14_quat"/>
+
+    <!-- WHISKER 15 -->
+    <jointpos joint="base2whisker15_y" name="whisker15_y"/>
+    <jointpos joint="base2whisker15_x" name="whisker15_x"/>
+    <velocimeter site="vel_sensor_15" name="vel_15"/>
+    <framepos objtype="site" objname="whisker15S_last" reftype="site" refname="vel_sensor_15" name="tip_pos_15"/>
+    <framequat objtype="site" objname="whisker15S_first" name="whisker15_quat"/>
+
+    <!-- WHISKER 16 -->
+    <jointpos joint="base2whisker16_y" name="whisker16_y"/>
+    <jointpos joint="base2whisker16_x" name="whisker16_x"/>
+    <velocimeter site="vel_sensor_16" name="vel_16"/>
+    <framepos objtype="site" objname="whisker16S_last" reftype="site" refname="vel_sensor_16" name="tip_pos_16"/>
+    <framequat objtype="site" objname="whisker16S_first" name="whisker16_quat"/>
+
+  </sensor>
+
+</mujoco>
